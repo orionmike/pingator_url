@@ -48,9 +48,12 @@ def get_real_status_code(url: str) -> int:
 
     try:
 
-        r = UrlRequest(method='get', url=url)
+        r = UrlRequest(method='get', url=url, timeout=2)
         r.send()
         status_code = r.status_code
+
+        if status_code != 200:
+            logger.error(f'{url} :: {status_code}')
 
     except Exception as e:
         print(f'{Fore.RED} get_real_status_code -> error: {e}')

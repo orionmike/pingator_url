@@ -7,7 +7,7 @@ time_scan=1
 
 [db_sqlite]
 db_dir='db'
-db_file='db_request.sqlite3'
+db_file='db_responce.sqlite3'
 
 [telegram]
 bot_token='bot_token'

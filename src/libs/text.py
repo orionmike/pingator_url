@@ -10,4 +10,4 @@ def get_time_now() -> str:
 
 
 def get_tg_message(url: str, status_code: int) -> str:
-    return f'{get_dt_now()} {url.replace("https://", "")}: new status code :: {status_code}'
+    return f'{get_dt_now()} <b>{url.replace("https://", "")}</b> ➜ <b>{status_code}</b>'
