@@ -1,0 +1,14 @@
+[utils]
+console_indent = '...'
+
+[ping]
+url_list=['https://ya.ru', 'https://google.com']
+time_scan=1
+
+[db_sqlite]
+db_dir='db'
+db_file='db_request.sqlite3'
+
+[telegram]
+bot_token='bot_token'
+user_id=123
