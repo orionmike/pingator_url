@@ -1,11 +1,11 @@
-from datetime import datetime
+
+from urllib.parse import urlparse
 
 import requests
 
-from config import IND, TG_BOT_TOKEN, TG_USER_ID, Fore, logger
-from database.database import session_maker
-from database.models import UrlResponce
+from config import IND, SUCCESS_CODE_LIST, TG_BOT_TOKEN, TG_USER_ID, Fore, logger
 from libs.text import get_tg_message, get_time_now
+from config import URL_DICT
 
 
 class UrlRequest:
@@ -52,42 +52,41 @@ def get_real_status_code(url: str) -> int:
         r.send()
         status_code = r.status_code
 
-        if status_code != 200:
+        if status_code not in SUCCESS_CODE_LIST:
             logger.error(f'{url} :: {status_code}')
 
     except Exception as e:
         print(f'{Fore.RED} get_real_status_code -> error: {e}')
+        logger.error(f'get_real_status_code: -> e:{e}')
 
     return status_code
 
 
 def update_status_code(url: str, status_code: int) -> None:
+    """update status code for case using dict"""
+
+    global URL_DICT
+    # print(URL_DICT)
 
     try:
 
-        with session_maker() as session:
+        exist_status_code = URL_DICT.get(url)
+        # print(status_code, exist_status_code)
 
-            exist_responce = session.query(UrlResponce).filter_by(url=url).first()
+        if exist_status_code:
+            if status_code != exist_status_code:
 
-            if exist_responce:
-                if status_code != exist_responce.status_code:
+                print(f'{IND} {url} -> new status_code: {status_code}')
 
-                    print(f'{IND} {exist_responce.url} -> new status_code: {status_code}')
+                hostname = urlparse(url).hostname
 
-                    message = get_tg_message(url, status_code)
-                    bot_send_message(TG_USER_ID, message)
+                message = get_tg_message(hostname, status_code)
+                bot_send_message(TG_USER_ID, message)
 
-                exist_responce.status_code = status_code
-                exist_responce.datetime_update = datetime.now()
-                session.commit()
+                URL_DICT[url] = status_code
 
-            else:
-                new_responce = UrlResponce()
-                new_responce.url = url
-                new_responce.status_code = status_code
-                new_responce.datetime_update = datetime.now()
-                session.add(new_responce)
-                session.commit()
+        else:
+            URL_DICT[url] = status_code
 
     except Exception as e:
         print(f'{Fore.RED} update_status_code -> e:{e}')
@@ -106,9 +105,10 @@ def bot_send_message(user_id, message) -> None:
             request.send()
 
             if request.status_code == 200:
-                print(f'{IND*2} bot_send_message: ok')
+                print(f'{IND*2} {get_time_now()} bot_send_message: ok')
             else:
-                print(f'{IND*2} bot_send_message: error -> {request.status_code}')
+                print(f'{IND*2} {get_time_now()} bot_send_message: error -> {request.status_code}')
 
     except Exception as e:
         print(f'{Fore.RED} bot_send_message -> error: {e}')
+        logger.error(f'{Fore.RED} bot_send_message -> error: {e}')
