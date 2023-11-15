@@ -1,7 +1,3 @@
 # Pingator
 
-service for ping url address, when changing - sending messages to telegram
-
-- python 3.11
-- database: SQLite
-- ORM: SQLAlchemy
+Простой сервис для проверки статуса работы сайтов и сервисов. Если код ответа возвращает ошибку - в телеграм отправляется сообщение от телеграм бота (его нужно будет завести заранее).
